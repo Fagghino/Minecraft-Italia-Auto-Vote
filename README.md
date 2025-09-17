@@ -126,4 +126,3 @@ node .\vota.js
 ---
 
 Realizzato per automatizzare un singolo voto su `minecraft-italia.net` — usa con cura.
-
