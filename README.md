@@ -67,7 +67,7 @@ Descrizione variabili:
 - `PASSWORD`: password per il login.
 - `SERVER_URL`: URL della pagina del server da votare (es. `https://minecraft-italia.net/server/slug-o-id`).
 - `HEADLESS`: stringa. Se `false` avvia il browser visibile; altrimenti headless.
-- `KEEP_OPEN`: opzionale, non usata direttamente da `vota.js` (lasciata per compatibilità con gli script di esecuzione).
+
 
 Suggerimento rapido: copia l'esempio in un file `.env` e modifica i valori:
 
