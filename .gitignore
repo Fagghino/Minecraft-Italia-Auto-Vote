@@ -1,0 +1,19 @@
+# Ambiente: non committare il file con credenziali
+.env
+
+# Dipendenze Node
+node_modules/
+
+# Log e debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# VSCode
+.vscode/
