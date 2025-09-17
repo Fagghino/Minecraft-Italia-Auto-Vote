@@ -6,10 +6,17 @@
   "scripts": {
     "start": "node .\\vota.js",
     "vote": "node .\\vota.js",
+    "start:visible": "cross-env HEADLESS=false node .\\vota.js",
+    "start:headless": "cross-env HEADLESS=true node .\\vota.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "Franchino961 @MeGustaLaMangusta",
   "license": "ISC",
-  "type": "commonjs"
+  "type": "commonjs",
+  "dependencies": {
+    "puppeteer": "^20.11.0",
+    "dotenv": "^16.4.0",
+    "cross-env": "^7.0.3"
+  }
 }
