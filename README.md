@@ -39,6 +39,12 @@ Script pensato per effettuare una singola esecuzione di voto sul sito `minecraft
 npm install puppeteer dotenv
 ```
 
+Se preferisci installare tutte le dipendenze elencate in `package.json` (consigliato):
+
+```powershell
+npm install
+```
+
 ---
 
 **Configurazione `.env`**
@@ -63,6 +69,20 @@ Descrizione variabili:
 - `HEADLESS`: stringa. Se `false` avvia il browser visibile; altrimenti headless.
 - `KEEP_OPEN`: opzionale, non usata direttamente da `vota.js` (lasciata per compatibilità con gli script di esecuzione).
 
+Suggerimento rapido: copia l'esempio in un file `.env` e modifica i valori:
+
+PowerShell:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+CMD (Prompt dei comandi):
+
+```cmd
+copy .env.example .env
+```
+
 ---
 
 **Esecuzione**
@@ -71,6 +91,16 @@ Descrizione variabili:
 
 ```powershell
 node .\vota.js
+```
+
+Oppure usa gli script npm aggiunti:
+
+```powershell
+# Modalità headless (predefinita)
+npm run start:headless
+
+# Modalità visibile
+npm run start:visible
 ```
 
 - Usare lo script PowerShell incluso (`run-vota.ps1`) e passare le opzioni:
@@ -91,6 +121,8 @@ node .\vota.js
 - Lo script attende la comparsa di un elemento `div.button` contenente il testo `+1` e prova a cliccarlo.
 - Sono presenti ritardi e wait per gestire caricamenti e banner; potresti dover aumentare i timeout su connessioni lente.
 - Per debug visivo impostare `HEADLESS=false`.
+
+Nota su Puppeteer: durante `npm install` Puppeteer scarica una build di Chromium (~100+ MB). Se vuoi evitare il download automatico, consulta la documentazione di Puppeteer su come collegare una versione di Chrome/Chromium già presente (opzione `PUPPETEER_SKIP_CHROMIUM_DOWNLOAD` o impostazioni `puppeteer` nel `package.json`).
 
 ---
 
