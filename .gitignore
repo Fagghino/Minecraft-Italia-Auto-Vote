@@ -1,30 +1,88 @@
-node_modules/
+# ========================================
+# .gitignore - Minecraft-Italia Auto-Vote
+# ========================================
+# Questo file specifica quali file e cartelle devono essere
+# esclusi dal controllo versione Git per motivi di sicurezza,
+# privacy o perché generati automaticamente
+
+# ========================================
+# FILE SENSIBILI - SICUREZZA
+# ========================================
+# NON committare mai questi file!
+
+# File con credenziali di login e configurazioni sensibili
 .env
-/.pnp
+
+# File con i cookies di sessione (contiene dati di autenticazione)
+cookies.json
+
+# ========================================
+# DIPENDENZE E MODULI
+# ========================================
+# Cartelle generate automaticamente da npm/yarn
+
+# Moduli Node.js scaricati da npm install
+node_modules/
+
+# File di Yarn Plug'n'Play
 .pnp.js
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+/.pnp
+
+# ========================================
+# FILE DI BUILD E DISTRIBUZIONE
+# ========================================
+# File generati durante la build del progetto
+
+# Cartella di distribuzione
 dist/
+
+# Cartella di coverage per i test
 coverage/
-/.idea
-.vscode
-# Ambiente: non committare il file con credenziali
-.env
 
-# Dipendenze Node
-node_modules/
+# ========================================
+# LOG E DEBUG
+# ========================================
+# File di log generati automaticamente
 
-# Log e debug
+# Log di npm
 npm-debug.log*
+
+# Log di yarn
 yarn-debug.log*
 yarn-error.log*
+
+# Cartella generica per i log
 logs/
+
+# Tutti i file di log
 *.log
 
-# OS
-.DS_Store
-Thumbs.db
+# ========================================
+# FILE SPECIFICI DEGLI EDITOR/IDE
+# ========================================
+# Configurazioni specifiche dell'ambiente di sviluppo
 
 # VSCode
 .vscode/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# ========================================
+# FILE DI SISTEMA OPERATIVO
+# ========================================
+# File generati automaticamente dal sistema operativo
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
