@@ -1,7 +1,7 @@
 {
   "name": "bot-auto-vote",
-  "version": "1.0.0",
-  "description": "Script Node.js per inviare automaticamente un voto +1 su minecraft-italia.net tramite Puppeteer.",
+  "version": "1.1.0",
+  "description": "Script Node.js per inviare automaticamente un voto +1 su minecraft-italia.net tramite Puppeteer con persistenza della sessione e verifica del risultato.",
   "main": "vota.js",
   "scripts": {
     "start": "node .\\vota.js",
@@ -10,7 +10,14 @@
     "start:headless": "cross-env HEADLESS=true node .\\vota.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
+  "keywords": [
+    "minecraft",
+    "minecraft-italia",
+    "vote",
+    "automation",
+    "puppeteer",
+    "bot"
+  ],
   "author": "Franchino961 @MeGustaLaMangusta",
   "license": "ISC",
   "type": "commonjs",
