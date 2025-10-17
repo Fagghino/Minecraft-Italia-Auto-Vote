@@ -59,10 +59,6 @@ Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "  Minecraft-Italia Auto-Vote Bot" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
-Write-Host "Configurazione:" -ForegroundColor Yellow
-Write-Host "  HEADLESS  = $($env:HEADLESS)" -ForegroundColor Gray
-Write-Host "  KEEP_OPEN = $($env:KEEP_OPEN)" -ForegroundColor Gray
-Write-Host ""
 Write-Host "Avvio vota.js in corso..." -ForegroundColor Green
 Write-Host ""
 
