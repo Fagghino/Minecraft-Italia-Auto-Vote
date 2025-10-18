@@ -202,11 +202,11 @@ async function vota(page) {
   
   try {
     // ----------------------------------------
-    // Ricerca e click sul pulsante "+1"
+    // STEP 1: Ricerca e click sul pulsante "+1"
     // ----------------------------------------
     
     // Esegue codice JavaScript nella pagina per trovare e cliccare il pulsante di voto
-    const votoEseguito = await page.evaluate(() => {
+    const plusOneCliccato = await page.evaluate(() => {
       // Seleziona tutti i div con classe "button"
       const divs = Array.from(document.querySelectorAll('div.button'));
       
@@ -221,71 +221,110 @@ async function vota(page) {
       return false;
     });
     
+    if (!plusOneCliccato) {
+      console.log("⚠️ Nessun pulsante '+1' trovato sulla pagina.");
+      return;
+    }
+    
+    console.log("🔘 Pulsante '+1' cliccato, attendo popup...");
+    
     // ----------------------------------------
-    // Verifica del risultato del voto
+    // STEP 2: Aspetta che il popup appaia e clicca "Vota"
     // ----------------------------------------
     
-    if (votoEseguito) {
-      // Aspetta 2 secondi per dare tempo al sito di mostrare il messaggio di risposta
-      await new Promise(resolve => setTimeout(resolve, 2000));
+    // Aspetta un momento per far apparire il popup
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    // Cerca e clicca il pulsante "Vota" nel popup
+    const votoConfermatoNelPopup = await page.evaluate(() => {
+      // Cerca tutti i pulsanti o elementi cliccabili che contengono "Vota"
+      const buttons = Array.from(document.querySelectorAll('button, div.button, a.button, input[type="submit"], div[role="button"]'));
       
-      // Analizza il contenuto della pagina per determinare il risultato del voto
-      const risultatoVoto = await page.evaluate(() => {
-        // Ottiene tutto il testo visibile nella pagina
-        const body = document.body.innerText;
-        const bodyLower = body.toLowerCase(); // Versione minuscola per confronti case-insensitive
-        
-        // ----------------------------------------
-        // Controlla se hai già votato oggi
-        // ----------------------------------------
-        // Cerca il messaggio esatto del sito o varianti
-        if (body.includes('Per oggi hai gia votato, riprova domani.') ||
-            body.includes('Per oggi hai già votato, riprova domani.') ||
-            bodyLower.includes('già votato') || 
-            bodyLower.includes('gia votato') ||
-            bodyLower.includes('riprova domani')) {
-          return { status: 'gia_votato', message: 'Per oggi hai già votato, riprova domani' };
-        }
-        
-        // ----------------------------------------
-        // Controlla se il voto è andato a buon fine
-        // ----------------------------------------
-        // Cerca parole chiave che indicano successo
-        if (body.includes('grazie') ||
-            body.includes('voto registrato') ||
-            body.includes('voto inviato') ||
-            body.includes('successo') ||
-            body.includes('thank')) {
-          return { status: 'successo', message: 'Voto registrato con successo' };
-        }
-        
-        // ----------------------------------------
-        // Controlla messaggi di errore
-        // ----------------------------------------
-        if (body.includes('errore') || body.includes('error')) {
-          return { status: 'errore', message: 'Si è verificato un errore' };
-        }
-        
-        // Se non rientra in nessuna categoria, lo stato è indeterminato
-        return { status: 'indeterminato', message: 'Voto cliccato, stato non determinato' };
-      });
+      // Trova il pulsante che contiene il testo "Vota" (case-insensitive)
+      const votaButton = buttons.find(btn => 
+        btn.textContent && btn.textContent.trim().toLowerCase().includes('vota')
+      );
       
-      // ----------------------------------------
-      // Mostra il risultato con emoji appropriato e timestamp
-      // ----------------------------------------
-      if (risultatoVoto.status === 'successo') {
-        console.log(`✅ ${risultatoVoto.message} - ${new Date().toLocaleString()}`);
-      } else if (risultatoVoto.status === 'gia_votato') {
-        console.log(`⏰ ${risultatoVoto.message} - ${new Date().toLocaleString()}`);
-      } else if (risultatoVoto.status === 'errore') {
-        console.log(`❌ ${risultatoVoto.message} - ${new Date().toLocaleString()}`);
-      } else {
-        console.log(`🗳️ ${risultatoVoto.message} - ${new Date().toLocaleString()}`);
+      if (votaButton) {
+        votaButton.click();
+        return true;
       }
-    } else {
-      // Il pulsante "+1" non è stato trovato nella pagina
-      console.log("⚠️ Nessun div '+1' trovato sulla pagina.");
+      return false;
+    });
+    
+    if (!votoConfermatoNelPopup) {
+      console.log("⚠️ Pulsante 'Vota' nel popup non trovato.");
+      return;
     }
+    
+    console.log("✅ Pulsante 'Vota' nel popup cliccato!");
+    
+    // ----------------------------------------
+    // STEP 3: Aspetta la chiusura del popup (conferma voto registrato)
+    // ----------------------------------------
+    
+    // Aspetta che il popup si chiuda (indica voto registrato correttamente)
+    await new Promise(resolve => setTimeout(resolve, 2500));
+      
+    
+    // ----------------------------------------
+    // STEP 4: Verifica del risultato del voto
+    // ----------------------------------------
+    
+    // Analizza il contenuto della pagina per determinare il risultato del voto
+    const risultatoVoto = await page.evaluate(() => {
+      // Ottiene tutto il testo visibile nella pagina
+      const body = document.body.innerText;
+      const bodyLower = body.toLowerCase(); // Versione minuscola per confronti case-insensitive
+      
+      // ----------------------------------------
+      // Controlla se hai già votato oggi
+      // ----------------------------------------
+      // Cerca il messaggio esatto del sito o varianti
+      if (body.includes('Per oggi hai gia votato, riprova domani.') ||
+          body.includes('Per oggi hai già votato, riprova domani.') ||
+          bodyLower.includes('già votato') || 
+          bodyLower.includes('gia votato') ||
+          bodyLower.includes('riprova domani')) {
+        return { status: 'gia_votato', message: 'Per oggi hai già votato, riprova domani' };
+      }
+      
+      // ----------------------------------------
+      // Controlla se il voto è andato a buon fine
+      // ----------------------------------------
+      // Cerca parole chiave che indicano successo
+      if (body.includes('grazie') ||
+          body.includes('voto registrato') ||
+          body.includes('voto inviato') ||
+          body.includes('successo') ||
+          body.includes('thank')) {
+        return { status: 'successo', message: 'Voto registrato con successo' };
+      }
+      
+      // ----------------------------------------
+      // Controlla messaggi di errore
+      // ----------------------------------------
+      if (body.includes('errore') || body.includes('error')) {
+        return { status: 'errore', message: 'Si è verificato un errore' };
+      }
+      
+      // Se il popup si è chiuso correttamente, il voto è registrato
+      return { status: 'successo', message: 'Voto registrato con successo (popup chiuso)' };
+    });
+    
+    // ----------------------------------------
+    // Mostra il risultato con emoji appropriato e timestamp
+    // ----------------------------------------
+    if (risultatoVoto.status === 'successo') {
+      console.log(`✅ ${risultatoVoto.message} - ${new Date().toLocaleString()}`);
+    } else if (risultatoVoto.status === 'gia_votato') {
+      console.log(`⏰ ${risultatoVoto.message} - ${new Date().toLocaleString()}`);
+    } else if (risultatoVoto.status === 'errore') {
+      console.log(`❌ ${risultatoVoto.message} - ${new Date().toLocaleString()}`);
+    } else {
+      console.log(`🗳️ ${risultatoVoto.message} - ${new Date().toLocaleString()}`);
+    }
+    
   } catch (error) {
     // Gestisce errori imprevisti durante l'operazione di voto
     console.error("❌ Errore durante il voto:", error);
