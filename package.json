@@ -1,7 +1,7 @@
 {
   "name": "bot-auto-vote",
-  "version": "1.1.0",
-  "description": "Script Node.js per inviare automaticamente un voto +1 su minecraft-italia.net tramite Puppeteer con persistenza della sessione e verifica del risultato.",
+  "version": "1.2.0",
+  "description": "Script Node.js per inviare automaticamente un voto +1 su minecraft-italia.net tramite Puppeteer con persistenza della sessione, gestione popup e verifica del risultato.",
   "main": "vota.js",
   "scripts": {
     "start": "node .\\vota.js",
