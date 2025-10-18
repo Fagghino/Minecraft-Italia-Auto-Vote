@@ -2,13 +2,13 @@
 
 Bot/script Node.js per automatizzare l'invio di un voto "+1" su `minecraft-italia.net` usando `Puppeteer`.
 
-**Versione Attuale:** 1.1.0
+**Versione Attuale:** 1.2.0
 
 ---
 
 **Descrizione breve**
 
-Script pensato per effettuare una singola esecuzione di voto sul sito `minecraft-italia.net`: effettua il login con le credenziali fornite, naviga alla pagina del server specificato e tenta di cliccare il pulsante "+1". Gestisce anche il banner GDPR quando presente.
+Script pensato per effettuare una singola esecuzione di voto sul sito `minecraft-italia.net`: effettua il login con le credenziali fornite, naviga alla pagina del server specificato, clicca il pulsante "+1" e poi conferma il voto cliccando "Vota" nel popup che appare. Gestisce anche il banner GDPR quando presente.
 
 **⚠️ Avvertenza importante**: usa questo strumento responsabilmente. L'automazione di voti può violare i termini di servizio del sito. Non committare mai i file `.env` (credenziali) e `cookies.json` (sessione) nel repository.
 
@@ -18,9 +18,13 @@ Script pensato per effettuare una singola esecuzione di voto sul sito `minecraft
 - **Login automatico**: effettua il login su `minecraft-italia.net` leggendo le credenziali da `.env`.
 - **Persistenza della sessione**: salva i cookies dopo il primo login in `cookies.json` per evitare di rifare il login ad ogni esecuzione.
 - **Verifica sessione**: controlla automaticamente se sei già loggato prima di effettuare un nuovo login.
-- **Invio voto "+1"**: naviga alla pagina del server e clicca il pulsante +1 se disponibile.
-- **Verifica risultato voto**: dopo aver cliccato il pulsante +1, lo script verifica e comunica se:
-  - ✅ Il voto è stato registrato con successo
+- **Invio voto in due step**: 
+  1. Clicca il pulsante "+1" sulla pagina del server
+  2. Attende che appaia il popup di conferma
+  3. Clicca il pulsante "Vota" nel popup
+  4. Verifica la chiusura del popup (conferma voto registrato)
+- **Verifica risultato voto**: dopo il completamento, lo script verifica e comunica se:
+  - ✅ Il voto è stato registrato con successo (popup chiuso)
   - ⏰ Hai già votato oggi ("Per oggi hai già votato, riprova domani")
   - ❌ Si è verificato un errore
 - **Gestione banner GDPR**: prova ad accettare il banner di consenso se presente.
@@ -100,14 +104,18 @@ Lo script ora salva automaticamente i cookies di sessione dopo il primo login:
 🔐 Consenso GDPR accettato
 ✅ Login effettuato
 💾 Cookies salvati in cookies.json
-✅ Voto registrato con successo - 17/10/2025, 14:30:15
+🔘 Pulsante '+1' cliccato, attendo popup...
+✅ Pulsante 'Vota' nel popup cliccato!
+✅ Voto registrato con successo (popup chiuso) - 18/10/2025, 14:30:15
 ```
 
 **Esecuzioni successive:**
 ```
 🍪 Cookies caricati da file
 ✅ Sessione ancora valida, login non necessario
-✅ Voto registrato con successo - 17/10/2025, 14:35:22
+🔘 Pulsante '+1' cliccato, attendo popup...
+✅ Pulsante 'Vota' nel popup cliccato!
+✅ Voto registrato con successo (popup chiuso) - 18/10/2025, 14:35:22
 ```
 
 Se la sessione è scaduta, lo script effettuerà automaticamente un nuovo login e aggiornerà i cookies.
@@ -149,9 +157,13 @@ npm run start:visible
 ---
 
 **Comportamento e note tecniche**
-- Lo script attende la comparsa di un elemento `div.button` contenente il testo `+1` e prova a cliccarlo.
+- **Flusso di voto in due step**:
+  1. Lo script clicca il pulsante `+1` sulla pagina del server
+  2. Attende 1.5 secondi per la comparsa del popup di conferma
+  3. Cerca e clicca il pulsante "Vota" nel popup
+  4. Attende 2.5 secondi per verificare la chiusura del popup (conferma voto registrato)
 - **Gestione sessione**: i cookies vengono salvati in `cookies.json` dopo il primo login. Agli avvii successivi, lo script carica questi cookies e verifica se la sessione è ancora valida, saltando il login se non necessario.
-- **Feedback sul voto**: dopo aver cliccato il pulsante +1, lo script aspetta 2 secondi e controlla il contenuto della pagina per determinare se il voto è andato a buon fine o se hai già votato oggi.
+- **Feedback sul voto**: dopo aver completato i due click, lo script verifica il contenuto della pagina per determinare se il voto è andato a buon fine o se hai già votato oggi.
 - Sono presenti ritardi e wait per gestire caricamenti e banner; potresti dover aumentare i timeout su connessioni lente.
 - Per debug visivo impostare `HEADLESS=false`.
 - Il file `cookies.json` è escluso dal versioning Git per sicurezza (vedi `.gitignore`).
@@ -178,6 +190,11 @@ Nota su Puppeteer: durante `npm install` Puppeteer scarica una build di Chromium
 ---
 
 **Changelog (sintetico)**
+- 1.2.0: 
+  - ✨ Aggiunto supporto per il popup di conferma voto (click "+1" → popup → click "Vota")
+  - ✨ Verifica automatica della chiusura del popup come conferma del voto registrato
+  - 🔧 Migliorato il logging con step dettagliati del processo di voto
+  - 📝 Aggiornata documentazione con il nuovo flusso a due step
 - 1.1.0: 
   - ✨ Aggiunta persistenza della sessione tramite salvataggio cookies in `cookies.json`
   - ✨ Verifica automatica dello stato della sessione (evita login ripetuti)
