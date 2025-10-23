@@ -2,7 +2,7 @@
 
 Bot/script Node.js per automatizzare l'invio di un voto "+1" su `minecraft-italia.net` usando `Puppeteer`.
 
-**Versione Attuale:** 1.2.0
+**Versione Attuale:** 1.3.0
 
 ---
 
@@ -59,24 +59,33 @@ npm install
 
 **Configurazione `.env`**
 
-Esempio minimo di file `.env` (crealo nella cartella del progetto, non committarlo):
+Esempio completo di file `.env` (crealo nella cartella del progetto, non committarlo):
 
 ```env
+# CREDENZIALI OBBLIGATORIE
 EMAIL=tuo@email.it
 PASSWORD=tuapassword
-SERVER_URL=https://minecraft-italia.net/server/slug-o-id
-# Opzionale: impostalo a "false" (stringa) per avviare il browser visibile
-HEADLESS=false
-# Lo script include uno script PowerShell che passa anche KEEP_OPEN ma non è
-# utilizzato dal codice principale al momento; puoi impostarlo se lo usi
-KEEP_OPEN=false
+SERVER_URL=https://minecraft-italia.net/server/nomeserver/vota
+
+# IMPOSTAZIONI VISUALIZZAZIONE
+HEADLESS=true
+
+# PERSONALIZZAZIONE NOMI (OPZIONALI)
+PLAYER_NAME=TuoNickname
+SERVER_NAME=NomeDelTuoServer
 ```
 
-Descrizione variabili:
-- `EMAIL`: email/username per il login su `minecraft-italia.net`.
-- `PASSWORD`: password per il login.
-- `SERVER_URL`: URL della pagina del server da votare (es. `https://minecraft-italia.net/server/slug-o-id`).
-- `HEADLESS`: stringa. Se `false` avvia il browser visibile; altrimenti headless.
+**Descrizione variabili:**
+
+**Obbligatorie:**
+- `EMAIL`: email/username per il login su `minecraft-italia.net`
+- `PASSWORD`: password per il login
+- `SERVER_URL`: URL completo della pagina di voto del server
+
+**Opzionali:**
+- `HEADLESS`: `true` per browser nascosto, `false` per visibile (default: true)
+- `PLAYER_NAME`: nome giocatore da mostrare nei log (default: "InserisciNick")
+- `SERVER_NAME`: nome server da mostrare nei log (default: "ImpostaServer" o estratto da SERVER_URL)
 
 
 Suggerimento rapido: copia l'esempio in un file `.env` e modifica i valori:
@@ -190,6 +199,12 @@ Nota su Puppeteer: durante `npm install` Puppeteer scarica una build di Chromium
 ---
 
 **Changelog (sintetico)**
+- 1.3.0:
+  - 🔧 Semplificata gestione nomi player e server tramite variabili .env dirette
+  - ✨ Aggiunta configurazione PLAYER_NAME e SERVER_NAME in .env per controllo diretto
+  - 🗑️ Rimossa logica complessa di estrazione automatica nomi dalla pagina
+  - 📝 Messaggi informativi quando nomi non sono configurati ("InserisciNick", "ImpostaServer")
+  - 📋 Aggiornato .env.example con nuove variabili opzionali
 - 1.2.0: 
   - ✨ Aggiunto supporto per il popup di conferma voto (click "+1" → popup → click "Vota")
   - ✨ Verifica automatica della chiusura del popup come conferma del voto registrato
