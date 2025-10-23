@@ -41,6 +41,12 @@ const PASSWORD = process.env.PASSWORD; // Password per il login
 // URL della pagina del server da votare (letto da .env)
 const SERVER_URL = process.env.SERVER_URL;
 
+// Nome del player (opzionale, letto da .env come fallback)
+const PLAYER_NAME_FALLBACK = process.env.PLAYER_NAME;
+
+// Nome del server (opzionale, letto da .env come fallback)
+const SERVER_NAME_FALLBACK = process.env.SERVER_NAME;
+
 // Percorso del file dove salvare i cookies di sessione
 const COOKIES_PATH = path.join(__dirname, "cookies.json");
 
@@ -184,6 +190,41 @@ async function login(page) {
 }
 
 // ========================================
+// FUNZIONE PER GESTIRE INFORMAZIONI PLAYER E SERVER
+// ========================================
+
+/**
+ * Gestisce le informazioni del player e del server utilizzando le variabili .env
+ * Se non sono impostate, mostra messaggi informativi
+ * 
+ * @returns {Object} Oggetto con playerName e serverName
+ */
+function gestisciInformazioni() {
+  // Usa direttamente la variabile .env per il player, con fallback informativo
+  let playerName = 'InserisciNick';
+  if (PLAYER_NAME_FALLBACK && PLAYER_NAME_FALLBACK.trim()) {
+    playerName = PLAYER_NAME_FALLBACK.trim().substring(0, 30);
+  }
+  
+  // Usa direttamente la variabile .env per il server, con fallback informativo
+  let serverName = 'ImpostaServer';
+  if (SERVER_NAME_FALLBACK && SERVER_NAME_FALLBACK.trim()) {
+    serverName = SERVER_NAME_FALLBACK.trim().substring(0, 50);
+  } else if (SERVER_URL) {
+    // Se non c'è SERVER_NAME ma c'è SERVER_URL, prova a estrarre dal URL
+    const urlMatch = SERVER_URL.match(/\/server\/([^\/\?]+)/);
+    if (urlMatch) {
+      serverName = urlMatch[1]
+        .replace(/[-_]/g, ' ')
+        .replace(/\b\w/g, l => l.toUpperCase())
+        .substring(0, 50);
+    }
+  }
+  
+  return { playerName, serverName };
+}
+
+// ========================================
 // FUNZIONE DI VOTO
 // ========================================
 
@@ -196,6 +237,17 @@ async function login(page) {
 async function vota(page) {
   // Naviga alla pagina del server specificata in SERVER_URL
   await page.goto(SERVER_URL, { waitUntil: "networkidle2" });
+  
+  // ----------------------------------------
+  // STEP 0: Gestione informazioni player e server
+  // ----------------------------------------
+  
+  const { playerName, serverName } = gestisciInformazioni();
+  
+  console.log("📋 Informazioni configurate:");
+  console.log(`   👤 Player: ${playerName === 'InserisciNick' ? '⚠️ ' + playerName + ' - Configura PLAYER_NAME in .env' : '✅ ' + playerName}`);
+  console.log(`   🏰 Server: ${serverName === 'ImpostaServer' ? '⚠️ ' + serverName + ' - Configura SERVER_NAME in .env' : '✅ ' + serverName}`);
+  console.log("");
   
   // Aspetta che i pulsanti di voto siano visibili nella pagina
   await page.waitForSelector('div.button', { visible: true });
@@ -270,7 +322,7 @@ async function vota(page) {
     
     if (risultatoPopup.tipo === 'gia_votato') {
       console.log("⏰ " + risultatoPopup.messaggio + " - Hai già votato oggi!");
-      console.log(`⏰ Per oggi hai già votato, riprova domani - ${new Date().toLocaleString()}`);
+      console.log(`⏰ [${finalPlayerName}] ha già votato per [${finalServerName}] - ${new Date().toLocaleString()}`);
       return;
     } else if (risultatoPopup.tipo === 'voto_cliccato') {
       console.log("✅ " + risultatoPopup.messaggio);
@@ -289,7 +341,7 @@ async function vota(page) {
     // ----------------------------------------
     
     // Verifica semplificata: se siamo arrivati qui, il voto è andato a buon fine
-    console.log(`✅ Voto registrato con successo (popup chiuso) - ${new Date().toLocaleString()}`);
+    console.log(`✅ [${finalPlayerName}] ha votato con successo per [${finalServerName}] - ${new Date().toLocaleString()}`);
     
   } catch (error) {
     // Gestisce errori imprevisti durante l'operazione di voto
