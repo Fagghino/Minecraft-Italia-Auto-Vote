@@ -322,7 +322,7 @@ async function vota(page) {
     
     if (risultatoPopup.tipo === 'gia_votato') {
       console.log("⏰ " + risultatoPopup.messaggio + " - Hai già votato oggi!");
-      console.log(`⏰ [${finalPlayerName}] ha già votato per [${finalServerName}] - ${new Date().toLocaleString()}`);
+      console.log(`⏰ ${playerName} ha già votato per ${serverName} - ${new Date().toLocaleString()}`);
       return;
     } else if (risultatoPopup.tipo === 'voto_cliccato') {
       console.log("✅ " + risultatoPopup.messaggio);
@@ -341,8 +341,8 @@ async function vota(page) {
     // ----------------------------------------
     
     // Verifica semplificata: se siamo arrivati qui, il voto è andato a buon fine
-    console.log(`✅ [${finalPlayerName}] ha votato con successo per [${finalServerName}] - ${new Date().toLocaleString()}`);
-    
+    console.log(`✅ ${playerName} ha votato con successo per ${serverName} - ${new Date().toLocaleString()}`);
+
   } catch (error) {
     // Gestisce errori imprevisti durante l'operazione di voto
     console.error("❌ Errore durante il voto:", error);
