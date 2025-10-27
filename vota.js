@@ -1,10 +1,29 @@
 // ========================================
 // IMPORTAZIONE MODULI
 // ========================================
-require("dotenv").config(); // Carica le variabili d'ambiente dal file .env
-const puppeteer = require("puppeteer"); // Framework per automatizzare il browser Chrome/Chromium
-const fs = require("fs"); // File system per leggere/scrivere file
 const path = require("path"); // Utility per gestire percorsi di file
+const fs = require("fs"); // File system per leggere/scrivere file
+
+// Carica le variabili d'ambiente dal file .env
+// Supporta percorsi personalizzati tramite CONFIG_DIR o cerca automaticamente in ./config
+const configDir = process.env.CONFIG_DIR || (() => {
+  // Se non specificato, cerca prima nella directory corrente, poi in ./config
+  const currentDir = __dirname;
+  const configPath = path.join(currentDir, 'config');
+  
+  // Se esiste la cartella config e contiene .env, usa quella
+  if (fs.existsSync(path.join(configPath, '.env'))) {
+    return configPath;
+  }
+  
+  // Altrimenti usa la directory corrente
+  return currentDir;
+})();
+
+const envPath = path.join(configDir, ".env");
+require("dotenv").config({ path: envPath });
+
+const puppeteer = require("puppeteer"); // Framework per automatizzare il browser Chrome/Chromium
 
 /*
   ========================================
@@ -48,7 +67,7 @@ const PLAYER_NAME_FALLBACK = process.env.PLAYER_NAME;
 const SERVER_NAME_FALLBACK = process.env.SERVER_NAME;
 
 // Percorso del file dove salvare i cookies di sessione
-const COOKIES_PATH = path.join(__dirname, "cookies.json");
+const COOKIES_PATH = path.join(configDir, "cookies.json");
 
 // ========================================
 // FUNZIONI PER LA GESTIONE DELLA SESSIONE
