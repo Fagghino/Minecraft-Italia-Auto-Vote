@@ -2,7 +2,7 @@
 
 Bot/script Node.js per automatizzare l'invio di un voto "+1" su `minecraft-italia.net` usando `Puppeteer`.
 
-**Versione Attuale:** 1.3.0
+**Versione Attuale:** 1.3.1
 
 ---
 
@@ -59,7 +59,7 @@ npm install
 
 **Configurazione `.env`**
 
-Esempio completo di file `.env` (crealo nella cartella del progetto, non committarlo):
+Il bot cerca automaticamente il file `.env` prima nella directory corrente, poi nella cartella `config/` se non lo trova.
 
 ```env
 # CREDENZIALI OBBLIGATORIE
@@ -199,6 +199,11 @@ Nota su Puppeteer: durante `npm install` Puppeteer scarica una build di Chromium
 ---
 
 **Changelog (sintetico)**
+- 1.3.1:
+  - 🔧 Rilevamento automatico della cartella config/ per file di configurazione
+  - ✨ Rimossa necessità di impostare CONFIG_DIR manualmente
+  - 📁 Supporto nativo per file .env e cookies.json in config/
+  - 📝 Semplificata configurazione senza percorsi da scrivere
 - 1.3.0:
   - 🔧 Semplificata gestione nomi player e server tramite variabili .env dirette
   - ✨ Aggiunta configurazione PLAYER_NAME e SERVER_NAME in .env per controllo diretto
