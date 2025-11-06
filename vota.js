@@ -317,10 +317,24 @@ async function checkPlayerVotedToday(serverSlug, playerName) {
       return a === target || a.includes(target) || target.includes(a);
     }).length;
     
+    // Estrai data/ora dell'ultimo voto se trovato
+    let lastVoteTime = null;
+    if (match) {
+      const voteTimestamp = match.timestamp || match.date || match.voted_at;
+      if (voteTimestamp) {
+        try {
+          lastVoteTime = new Date(voteTimestamp);
+        } catch (e) {
+          // Ignora errori di parsing
+        }
+      }
+    }
+    
     return { 
       alreadyVoted: !!match, 
       playerVotesOnServer,
-      serverTotalVotes 
+      serverTotalVotes,
+      lastVoteTime
     };
   } catch (err) {
     return { alreadyVoted: false };
@@ -593,7 +607,16 @@ async function vota(page) {
         
         if (voteCheck.alreadyVoted) {
           console.log(`⏰ Hai già votato oggi per questo server!`);
-          console.log(`   Ultimo voto: oggi ${new Date().toLocaleTimeString()}`);
+          
+          // Mostra data/ora esatta dell'ultimo voto se disponibile
+          if (voteCheck.lastVoteTime && voteCheck.lastVoteTime instanceof Date) {
+            const hours = String(voteCheck.lastVoteTime.getHours()).padStart(2, '0');
+            const minutes = String(voteCheck.lastVoteTime.getMinutes()).padStart(2, '0');
+            console.log(`   Ultimo voto: oggi alle ${hours}:${minutes}`);
+          } else {
+            console.log(`   Ultimo voto: oggi`);
+          }
+          
           console.log(`   Riprova domani per votare di nuovo\n`);
           console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
           return;
