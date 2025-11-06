@@ -27,6 +27,8 @@ Script pensato per effettuare una singola esecuzione di voto sul sito `minecraft
   - ✅ Il voto è stato registrato con successo (popup chiuso)
   - ⏰ Hai già votato oggi ("Per oggi hai già votato, riprova domani")
   - ❌ Si è verificato un errore
+- **Statistiche voti**:
+  - 📊 Voti totali del server (da API Minecraft-Italia)
 - **Gestione banner GDPR**: prova ad accettare il banner di consenso se presente.
 - **Modalità headless opzionale**: puoi eseguire il browser visibile impostando `HEADLESS=false`.
 
@@ -70,9 +72,38 @@ SERVER_URL=https://minecraft-italia.net/server/nomeserver/vota
 # IMPOSTAZIONI VISUALIZZAZIONE
 HEADLESS=true
 
-# PERSONALIZZAZIONE NOMI (OPZIONALI)
-PLAYER_NAME=TuoNickname
-SERVER_NAME=NomeDelTuoServer
+# PERSONALIZZAZIONE NOMI (OPZIONALI / AUTOMATICO)
+# PLAYER_NAME e SERVER_NAME sono opzionali: lo script tenterà di
+# rilevare automaticamente il nickname del giocatore dalla sessione
+# autenticata e il nome del server tramite API o dall'URL. Puoi
+# comunque impostarli manualmente qui se lo desideri per scopi di log.
+# Esempio (opzionale):
+# PLAYER_NAME=TuoNickname
+# SERVER_NAME=NomeDelTuoServer
+```
+
+Opzioni API (opzionali):
+
+```env
+# Abilita il pre-check via API per evitare click inutili (true|false)
+USE_API_PRECHECK=false
+# Endpoint API (di default non serve modificarlo)
+# API_BASE=https://minecraft-italia.net/lista/api
+```
+
+Variabili avanzate per le API (opzionali):
+
+```env
+# Quante volte riprovare le chiamate API (retry)
+API_RETRIES=3
+# Base delay (ms) per exponential backoff
+API_BACKOFF_BASE_MS=500
+# Timeout per chiamata API (ms)
+API_TIMEOUT_MS=7000
+# Intervallo minimo (ms) fra chiamate API per evitare rate limit
+API_MIN_INTERVAL_MS=200
+# TTL cache serverInfo (secondi)
+API_CACHE_TTL_SEC=60
 ```
 
 **Descrizione variabili:**
@@ -86,6 +117,8 @@ SERVER_NAME=NomeDelTuoServer
 - `HEADLESS`: `true` per browser nascosto, `false` per visibile (default: true)
 - `PLAYER_NAME`: nome giocatore da mostrare nei log (default: "InserisciNick")
 - `SERVER_NAME`: nome server da mostrare nei log (default: "ImpostaServer" o estratto da SERVER_URL)
+
+Nota: se non impostati, lo script proverà a rilevarli automaticamente dalla sessione (player) e dalle API/URL (server).
 
 
 Suggerimento rapido: copia l'esempio in un file `.env` e modifica i valori:
@@ -199,11 +232,19 @@ Nota su Puppeteer: durante `npm install` Puppeteer scarica una build di Chromium
 ---
 
 **Changelog (sintetico)**
+- 1.3.2:
+  - 📊 Visualizzazione voti totali del server (da API Minecraft-Italia)
+  - 🎨 Interfaccia console migliorata con separatori e emoji
+  - ✨ Messaggi più chiari e user-friendly
+  - 🔧 Rimosso tracciamento locale voti (solo statistiche API)
 - 1.3.1:
   - 🔧 Rilevamento automatico della cartella config/ per file di configurazione
   - ✨ Rimossa necessità di impostare CONFIG_DIR manualmente
   - 📁 Supporto nativo per file .env e cookies.json in config/
   - 📝 Semplificata configurazione senza percorsi da scrivere
+  - 🧩 Integrazione opzionale con le API di Minecraft-Italia per pre-check voti (USE_API_PRECHECK)
+    - Se abilitato, lo script verifica via API se l'utente ha già votato oggi e può saltare il click
+    - Il comportamento è sicuro: in caso di errore API il flusso web normale è eseguito come fallback
 - 1.3.0:
   - 🔧 Semplificata gestione nomi player e server tramite variabili .env dirette
   - ✨ Aggiunta configurazione PLAYER_NAME e SERVER_NAME in .env per controllo diretto
