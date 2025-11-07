@@ -279,7 +279,7 @@ Nota su Puppeteer: durante `npm install` Puppeteer scarica una build di Chromium
 **Licenza**
 - Questo progetto è rilasciato sotto licenza **ISC**
 - Vedi il file [LICENSE](LICENSE) per i dettagli completi
-- Copyright (c) 2025 [Franchino961](t.me/MeGustaLaMangusta)
+- Copyright (c) 2025 [Franchino961](https://t.me/MeGustaLaMangusta)
 
 ---
 
