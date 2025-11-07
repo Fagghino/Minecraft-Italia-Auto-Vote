@@ -2,7 +2,7 @@
 
 Bot/script Node.js per automatizzare l'invio di un voto "+1" su `minecraft-italia.net` usando `Puppeteer`.
 
-**Versione Attuale:** 1.3.1
+**Versione Attuale:** 1.3.2
 
 ---
 
@@ -29,6 +29,7 @@ Script pensato per effettuare una singola esecuzione di voto sul sito `minecraft
   - ❌ Si è verificato un errore
 - **Statistiche voti**:
   - 📊 Voti totali del server (da API Minecraft-Italia)
+  - ⏰ Orario esatto dell'ultimo voto (da API)
 - **Gestione banner GDPR**: prova ad accettare il banner di consenso se presente.
 - **Modalità headless opzionale**: puoi eseguire il browser visibile impostando `HEADLESS=false`.
 
@@ -234,9 +235,13 @@ Nota su Puppeteer: durante `npm install` Puppeteer scarica una build di Chromium
 **Changelog (sintetico)**
 - 1.3.2:
   - 📊 Visualizzazione voti totali del server (da API Minecraft-Italia)
+  - ⏰ Visualizzazione orario esatto ultimo voto (da API timestamp)
   - 🎨 Interfaccia console migliorata con separatori e emoji
   - ✨ Messaggi più chiari e user-friendly
   - 🔧 Rimosso tracciamento locale voti (solo statistiche API)
+  - 🧹 Pulizia script run-vota.bat e run-vota.ps1
+  - 🔄 Rilevamento automatico giocatore dalla pagina autenticata
+  - 🔄 Rilevamento automatico server da API
 - 1.3.1:
   - 🔧 Rilevamento automatico della cartella config/ per file di configurazione
   - ✨ Rimossa necessità di impostare CONFIG_DIR manualmente
@@ -272,7 +277,9 @@ Nota su Puppeteer: durante `npm install` Puppeteer scarica una build di Chromium
 ---
 
 **Licenza**
-- Questo progetto utilizza la licenza **ISC** (vedi `package.json`).
+- Questo progetto è rilasciato sotto licenza **ISC**
+- Vedi il file [LICENSE](LICENSE) per i dettagli completi
+- Copyright (c) 2025 [Franchino961](t.me/MeGustaLaMangusta)
 
 ---
 
