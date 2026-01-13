@@ -549,23 +549,22 @@ async function vota(page) {
       const detected = await getPlayerNameFromPage(page);
       if (detected) {
         playerName = detected.substring(0, 30);
-        console.log(`👤 Giocatore rilevato: ${playerName}`);
-      } else {
-        console.log(`⚠️  Giocatore: non rilevato (puoi impostarlo in .env)`);
       }
     } catch (e) {
-      console.log(`⚠️  Giocatore: non rilevato (puoi impostarlo in .env)`);
+      // Ignora errori di rilevamento
     }
-  } else {
-    console.log(`👤 Giocatore: ${playerName}`);
   }
 
+  // Variabili per raccogliere tutte le info prima di mostrarle
+  let serverInfo = null;
+  let voteCheck = null;
+  let slug = null;
+  let votesTodayCount = 0;
+  
   // If API pre-check is enabled, attempt to determine server slug and check votes before touching the page
   if (USE_API_PRECHECK) {
-    console.log("🔍 Controllo voto tramite API...");
     try {
       // Attempt to find a slug from SERVER_URL (prefer /server/slug or last path segment)
-      let slug = null;
       if (SERVER_URL) {
         const m = SERVER_URL.match(/\/server\/([^\/\?]+)/);
         if (m) slug = m[1];
@@ -577,59 +576,101 @@ async function vota(page) {
 
       // Enrich serverName from API when possible
       if (slug) {
-        const info = await getServerInfoFromApi(slug);
-        if (info && info.name) {
-          // prefer human-readable name
-          serverName = info.name;
-          console.log(`🏰 Server: ${serverName} (ID: ${info.id || 'n/a'})`);
-          
-          // Show online players if available
-          const onlineCount = info.online || info.online_players;
-          if (typeof onlineCount === 'number') {
-            console.log(`👥 Giocatori online: ${onlineCount}`);
-          }
-        } else {
-          console.log(`🏰 Server: ${serverName}`);
+        serverInfo = await getServerInfoFromApi(slug);
+        if (serverInfo && serverInfo.name) {
+          serverName = serverInfo.name;
         }
-      } else {
-        console.log(`🏰 Server: ${serverName}`);
       }
 
-      // Pre-check: if player already voted today, skip interaction
+      // Pre-check: if player already voted today, get vote info
       if (slug && playerName && playerName !== 'InserisciNick') {
-        const voteCheck = await checkPlayerVotedToday(slug, playerName);
-        
-        // Mostra statistiche voti da API
-        if (voteCheck.serverTotalVotes) {
-          console.log(`📊 Voti totali server: ${voteCheck.serverTotalVotes}`);
-        }
-        console.log("");
-        
-        if (voteCheck.alreadyVoted) {
-          console.log(`⏰ Hai già votato oggi per questo server!`);
-          
-          // Mostra data/ora esatta dell'ultimo voto se disponibile
-          if (voteCheck.lastVoteTime && voteCheck.lastVoteTime instanceof Date) {
-            const hours = String(voteCheck.lastVoteTime.getHours()).padStart(2, '0');
-            const minutes = String(voteCheck.lastVoteTime.getMinutes()).padStart(2, '0');
-            console.log(`   Ultimo voto: oggi alle ${hours}:${minutes}`);
-          } else {
-            console.log(`   Ultimo voto: oggi`);
-          }
-          
-          console.log(`   Riprova domani per votare di nuovo\n`);
-          console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
-          return;
-        } else {
-          console.log(`✅ Nessun voto trovato oggi - procedo con il voto\n`);
+        voteCheck = await checkPlayerVotedToday(slug, playerName);
+      }
+      
+      // Count total votes today for the server
+      if (slug && serverInfo && serverInfo.id) {
+        const votesToday = await getServerVotesToday(serverInfo.id);
+        if (Array.isArray(votesToday)) {
+          votesTodayCount = votesToday.length;
         }
       }
     } catch (err) {
-      console.log('⚠️  Controllo API non disponibile - procedo comunque');
+      // Silently continue if API fails
+    }
+  }
+  
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // SEZIONE INFO
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  console.log("");
+  console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+  console.log("    INFO");
+  console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+  
+  if (playerName && playerName !== 'InserisciNick') {
+    console.log(`👤 Giocatore: ${playerName}`);
+  } else {
+    console.log(`👤 Giocatore: non rilevato`);
+  }
+  
+  console.log(`🏰 Server: ${serverName}`);
+  
+  // Giocatori online
+  if (serverInfo) {
+    const onlineCount = serverInfo.online || serverInfo.online_players;
+    if (typeof onlineCount === 'number') {
+      console.log(`👥 Giocatori online: ${onlineCount}`);
+    } else {
+      console.log(`👥 Giocatori online: non disponibile`);
     }
   } else {
-    // Se API pre-check non è abilitato, mostra comunque il server
-    console.log(`🏰 Server: ${serverName}`);
+    console.log(`👥 Giocatori online: non disponibile`);
+  }
+  
+  // Voti totali server
+  if (voteCheck && voteCheck.serverTotalVotes) {
+    console.log(`📊 Voti server oggi: ${voteCheck.serverTotalVotes}`);
+  } else if (serverInfo && serverInfo.votes) {
+    console.log(`📊 Voti server oggi: ${serverInfo.votes}`);
+  } else {
+    console.log(`📊 Voti server oggi: non disponibile`);
+  }
+  
+  // Posizione in classifica
+  if (serverInfo && typeof serverInfo.position === 'number') {
+    console.log(`🏆 Posizione in classifica: ${serverInfo.position}°`);
+  } else {
+    console.log(`🏆 Posizione in classifica: non disponibile`);
+  }
+  
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // CONTROLLO VOTO
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  console.log("");
+  console.log("");
+  console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+  console.log("🔍 Controllo voto tramite API...");
+  console.log("");
+  
+  if (voteCheck && voteCheck.alreadyVoted) {
+    console.log(`⏰ Hai già votato oggi per questo server!`);
+    
+    // Mostra data/ora esatta dell'ultimo voto se disponibile
+    if (voteCheck.lastVoteTime && voteCheck.lastVoteTime instanceof Date) {
+      const hours = String(voteCheck.lastVoteTime.getHours()).padStart(2, '0');
+      const minutes = String(voteCheck.lastVoteTime.getMinutes()).padStart(2, '0');
+      console.log(`   Ultimo voto: oggi alle ${hours}:${minutes}`);
+    } else {
+      console.log(`   Ultimo voto: oggi`);
+    }
+    
+    console.log(`   Riprova domani per votare di nuovo`);
+    console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+    return;
+  } else if (USE_API_PRECHECK && playerName && playerName !== 'InserisciNick') {
+    console.log(`✅ Nessun voto trovato oggi - procedo con il voto`);
+  } else if (!USE_API_PRECHECK) {
+    console.log(`⚠️  Controllo API disabilitato - procedo con il voto`);
   }
   
   console.log("");
