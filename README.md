@@ -2,19 +2,17 @@
 
 Bot/script Node.js per automatizzare l'invio di un voto "+1" su `minecraft-italia.net` usando `Puppeteer`.
 
-**Versione Attuale:** 1.3.2
+[![Versione](https://img.shields.io/badge/versione-1.3.3-blue.svg)]()
 
----
+> 📝 **Changelog**: Vedi [CHANGELOG.md](Docs/Changelog.md) per la cronologia delle versioni.
 
-**Descrizione breve**
+## 📋 Descrizione
 
 Script pensato per effettuare una singola esecuzione di voto sul sito `minecraft-italia.net`: effettua il login con le credenziali fornite, naviga alla pagina del server specificato, clicca il pulsante "+1" e poi conferma il voto cliccando "Vota" nel popup che appare. Gestisce anche il banner GDPR quando presente.
 
 **⚠️ Avvertenza importante**: usa questo strumento responsabilmente. L'automazione di voti può violare i termini di servizio del sito. Non committare mai i file `.env` (credenziali) e `cookies.json` (sessione) nel repository.
 
----
-
-**Funzionalità principali**
+## ✨ Funzionalità
 - **Login automatico**: effettua il login su `minecraft-italia.net` leggendo le credenziali da `.env`.
 - **Persistenza della sessione**: salva i cookies dopo il primo login in `cookies.json` per evitare di rifare il login ad ogni esecuzione.
 - **Verifica sessione**: controlla automaticamente se sei già loggato prima di effettuare un nuovo login.
@@ -33,16 +31,12 @@ Script pensato per effettuare una singola esecuzione di voto sul sito `minecraft
 - **Gestione banner GDPR**: prova ad accettare il banner di consenso se presente.
 - **Modalità headless opzionale**: puoi eseguire il browser visibile impostando `HEADLESS=false`.
 
----
-
-**Requisiti**
+## 📦 Requisiti
 - **Node.js** 12+ (consigliato Node.js 14+)
 - **npm** per installare le dipendenze
 - Connessione internet e credenziali valide per `minecraft-italia.net`
 
----
-
-**Installazione**
+## 🚀 Installazione
 
 1. Clona o scarica il repository nella tua macchina.
 2. Apri una PowerShell nella cartella del progetto.
@@ -58,9 +52,7 @@ Se preferisci installare tutte le dipendenze elencate in `package.json` (consigl
 npm install
 ```
 
----
-
-**Configurazione `.env`**
+## ⚙️ Configurazione
 
 Il bot cerca automaticamente il file `.env` prima nella directory corrente, poi nella cartella `config/` se non lo trova.
 
@@ -136,9 +128,7 @@ CMD (Prompt dei comandi):
 copy .env.example .env
 ```
 
----
-
-**Come funziona la persistenza della sessione**
+## 💾 Gestione Sessione
 
 Lo script ora salva automaticamente i cookies di sessione dopo il primo login:
 
@@ -165,9 +155,7 @@ Se la sessione è scaduta, lo script effettuerà automaticamente un nuovo login 
 
 Per forzare un nuovo login, è sufficiente eliminare il file `cookies.json`.
 
----
-
-**Esecuzione**
+## 🎮 Utilizzo
 
 - Eseguire direttamente con Node:
 
@@ -197,9 +185,7 @@ npm run start:visible
 
 - Usare lo script batch (`run-vota.bat`) da prompt o doppioclic (se presente).
 
----
-
-**Comportamento e note tecniche**
+## 🔧 Dettagli Tecnici
 - **Flusso di voto in due step**:
   1. Lo script clicca il pulsante `+1` sulla pagina del server
   2. Attende 1.5 secondi per la comparsa del popup di conferma
@@ -213,73 +199,70 @@ npm run start:visible
 
 Nota su Puppeteer: durante `npm install` Puppeteer scarica una build di Chromium (~100+ MB). Se vuoi evitare il download automatico, consulta la documentazione di Puppeteer su come collegare una versione di Chrome/Chromium già presente (opzione `PUPPETEER_SKIP_CHROMIUM_DOWNLOAD` o impostazioni `puppeteer` nel `package.json`).
 
----
-
-**Limitazioni e sicurezza**
+## 🛡️ Sicurezza e Limitazioni
 - Non salvare mai credenziali in repository pubblici.
 - Il file `cookies.json` contiene i dati di sessione e non deve essere condiviso o committato (è già presente in `.gitignore`).
 - I cookies di sessione possono scadere dopo un certo periodo (giorni/settimane); lo script rileverà la scadenza e effettuerà automaticamente un nuovo login.
 - Usare con responsabilità: l'automazione delle interazioni sui siti può violare i termini del servizio e/o risultare in ban.
 - Lo script è minimale e non implementa meccanismi avanzati di retry, proxy rotation o rate limiting.
 
----
+## ❓ FAQ
 
-**Suggerimenti e possibili miglioramenti**
+**Q: Il bot mi restituisce il messaggio 'non rilevato' accanto al Giocatore, è un problema?**
+A: Nessun problema! Se il bot non riesce a leggere il nome dalla pagina e tu non lo hai impostato nel `.env`, salterà semplicemente i controlli API per l'utente e procederà direttamente a votare, assicurandosi così di completare il suo lavoro.
+
+## 🔧 Sviluppo
+
+### Struttura del Progetto
+
+```text
+Minecraft-Italia Auto-Vote/
+├── config/
+│   ├── .env          (File di configurazione)
+│   └── .env.example
+├── Docs/
+│   └── CHANGELOG.md  (File aggiornamenti versione)
+├── node_modules/     (Dipendenze - autogenerato)
+├── package.json      (Configurazione librerie Node.js)
+├── run-vota.bat      (Script di avvio Windows CMD)
+├── run-vota.ps1      (Script di avvio PowerShell)
+└── vota.js           (Script primario del bot)
+```
+
+## 🚀 Funzionalità Pianificate
 - Aggiungere retry con backoff ed esponendo timeout configurabili.
 - Logging più dettagliato e salvataggio degli esiti in file.
 - Scheduling (es. usare `node-cron`) per esecuzioni periodiche con pause casuali.
 - Notifiche (email, Telegram, Discord) quando il voto viene completato o se ci sono errori.
 
----
+## 📄 Licenza
 
-**Changelog (sintetico)**
-- 1.3.2:
-  - 📊 Visualizzazione voti totali del server (da API Minecraft-Italia)
-  - ⏰ Visualizzazione orario esatto ultimo voto (da API timestamp)
-  - 🎨 Interfaccia console migliorata con separatori e emoji
-  - ✨ Messaggi più chiari e user-friendly
-  - 🔧 Rimosso tracciamento locale voti (solo statistiche API)
-  - 🧹 Pulizia script run-vota.bat e run-vota.ps1
-  - 🔄 Rilevamento automatico giocatore dalla pagina autenticata
-  - 🔄 Rilevamento automatico server da API
-- 1.3.1:
-  - 🔧 Rilevamento automatico della cartella config/ per file di configurazione
-  - ✨ Rimossa necessità di impostare CONFIG_DIR manualmente
-  - 📁 Supporto nativo per file .env e cookies.json in config/
-  - 📝 Semplificata configurazione senza percorsi da scrivere
-  - 🧩 Integrazione opzionale con le API di Minecraft-Italia per pre-check voti (USE_API_PRECHECK)
-    - Se abilitato, lo script verifica via API se l'utente ha già votato oggi e può saltare il click
-    - Il comportamento è sicuro: in caso di errore API il flusso web normale è eseguito come fallback
-- 1.3.0:
-  - 🔧 Semplificata gestione nomi player e server tramite variabili .env dirette
-  - ✨ Aggiunta configurazione PLAYER_NAME e SERVER_NAME in .env per controllo diretto
-  - 🗑️ Rimossa logica complessa di estrazione automatica nomi dalla pagina
-  - 📝 Messaggi informativi quando nomi non sono configurati ("InserisciNick", "ImpostaServer")
-  - 📋 Aggiornato .env.example con nuove variabili opzionali
-- 1.2.0: 
-  - ✨ Aggiunto supporto per il popup di conferma voto (click "+1" → popup → click "Vota")
-  - ✨ Verifica automatica della chiusura del popup come conferma del voto registrato
-  - 🔧 Migliorato il logging con step dettagliati del processo di voto
-  - 📝 Aggiornata documentazione con il nuovo flusso a due step
-- 1.1.0: 
-  - ✨ Aggiunta persistenza della sessione tramite salvataggio cookies in `cookies.json`
-  - ✨ Verifica automatica dello stato della sessione (evita login ripetuti)
-  - ✨ Rilevamento del risultato del voto (successo/già votato/errore)
-  - 📝 Aggiornato `.gitignore` per escludere `cookies.json`
-- 1.0.0: README iniziale ampliato, script principale `vota.js` presente.
+Questa mod è rilasciata sotto la [Licenza MIT](LICENSE).
 
----
+## 👤 Autore
 
-**Contributi e supporto**
-- Segnala bug o richieste tramite issue.
-- Per miglioramenti o PR, mantieni il file `.env` fuori dal commit e documenta le modifiche.
+**Fagghino**
+- [GitHub](https://github.com/Fagghino)
+- [Telegram](https://t.me/Fagghino)
+- [Discord](https://discord.gg/fagghino)
 
----
+## 🤝 Contributi
 
-**Licenza**
-- Questo progetto è rilasciato sotto licenza **MIT**
-- Vedi il file [LICENSE](LICENSE) per i dettagli completi
-- Copyright (c) 2025 [Franchino961](https://t.me/MeGustaLaMangusta)
+Contributi, issue e richieste di funzionalità sono benvenuti!
+- Apri una [Issue](../../issues) per segnalare bug o suggerire funzionalità
+- Apri una [Pull Request](../../pulls) per contribuire al codice
+
+## 💬 Supporto
+
+Se riscontri problemi o bug, segnalali includendo:
+- Descrizione dettagliata del problema
+- Log
+- Passaggi per riprodurre il problema
+- [Apri una Issue](issues)
+
+## 📝 Changelog
+
+Vedi [CHANGELOG.md](Docs/CHANGELOG.md) per la cronologia completa delle versioni.
 
 ---
 
