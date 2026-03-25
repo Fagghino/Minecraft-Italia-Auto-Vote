@@ -1,91 +1,72 @@
 # ========================================
 # .gitignore - Minecraft-Italia Auto-Vote
 # ========================================
-# Questo file specifica quali file e cartelle devono essere
-# esclusi dal controllo versione Git per motivi di sicurezza,
-# privacy o perché generati automaticamente
 
-# ========================================
-# FILE SENSIBILI - SICUREZZA
-# ========================================
-# NON committare mai questi file!
-
-# File con credenziali di login e configurazioni sensibili
+# Sicurezza & Credenziali
 .env
-
-# File con i cookies di sessione (contiene dati di autenticazione)
+.env.*
+!.env.example
 cookies.json
 
-# ========================================
-# DIPENDENZE E MODULI
-# ========================================
-# Cartelle generate automaticamente da npm/yarn
-
-# Moduli Node.js scaricati da npm install
+# Dipendenze Node.js
 node_modules/
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
 
-# File di Yarn Plug'n'Play
-.pnp.js
-/.pnp
-
-# ========================================
-# FILE DI BUILD E DISTRIBUZIONE
-# ========================================
-# File generati durante la build del progetto
-
-# Cartella di distribuzione
+# Build & Test
 dist/
-
-# Cartella di coverage per i test
+build/
+out/
 coverage/
+.nyc_output/
+*.tsbuildinfo
 
-# ========================================
-# LOG E DEBUG
-# ========================================
-# File di log generati automaticamente
-
-# Log di npm
+# Log & Debug
+logs/
+*.log
 npm-debug.log*
-
-# Log di yarn
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
 
-# Cartella generica per i log
-logs/
+# Cache & Temporanei
+.npm/
+.eslintcache
+.stylelintcache
+.prettiercache
+tmp/
+temp/
 
-# Tutti i file di log
-*.log
-
-# ========================================
-# FILE SPECIFICI DEGLI EDITOR/IDE
-# ========================================
-# Configurazioni specifiche dell'ambiente di sviluppo
-
-# VSCode
-.vscode/
-
-# IntelliJ IDEA
+# IDE & Editor
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
 .idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 *.iml
 
-# ========================================
-# FILE DI SISTEMA OPERATIVO
-# ========================================
-# File generati automaticamente dal sistema operativo
-
-# macOS
+# Sistema Operativo
 .DS_Store
 .AppleDouble
 .LSOverride
-
-# Windows
+._*
+.Spotlight-V100
+.Trashes
 Thumbs.db
 ehthumbs.db
 Desktop.ini
-
-# Linux
 *~
 
-# Cartella API
+# Specifiche del progetto
 api/
