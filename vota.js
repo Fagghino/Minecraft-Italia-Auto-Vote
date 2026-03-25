@@ -452,7 +452,10 @@ async function getPlayerNameFromPage(page) {
       const exists = await page.$(sel);
       if (exists) {
         const txt = await page.$eval(sel, el => el.innerText && el.innerText.trim());
-        if (txt && txt.length > 1) return txt;
+        // Ignoriamo i link civetta lunghi (max 20 char) e il testo "aggiungi" 
+        if (txt && txt.length > 1 && txt.length <= 20 && !txt.toLowerCase().includes('aggiungi')) {
+          return txt;
+        }
       }
     } catch (e) {
       // ignore and continue
