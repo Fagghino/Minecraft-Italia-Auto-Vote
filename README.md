@@ -2,7 +2,7 @@
 
 Bot/script Node.js per automatizzare l'invio di un voto "+1" su `minecraft-italia.net` usando `Puppeteer`.
 
-[![Versione](https://img.shields.io/badge/versione-1.3.3-blue.svg)]()
+[![Versione](https://img.shields.io/badge/versione-1.4.0-blue.svg)]()
 
 > 📝 **Changelog**: Vedi [CHANGELOG.md](Docs/Changelog.md) per la cronologia delle versioni.
 
@@ -221,12 +221,18 @@ Minecraft-Italia Auto-Vote/
 │   ├── .env          (File di configurazione)
 │   └── .env.example
 ├── Docs/
-│   └── CHANGELOG.md  (File aggiornamenti versione)
+│   ├── CHANGELOG.md  (File aggiornamenti versione)
+│   └── Commit.md     (Storico commit formattato)
+├── src/              (Moduli interni del bot)
+│   ├── config.js     (Caricamento .env ed esportazione costanti)
+│   ├── utils.js      (Funzioni di supporto generiche)
+│   ├── api.js        (Comunicazione con le API di Minecraft-Italia)
+│   └── browser.js    (Automazione Puppeteer: login, sessione, voto)
 ├── node_modules/     (Dipendenze - autogenerato)
 ├── package.json      (Configurazione librerie Node.js)
 ├── run-vota.bat      (Script di avvio Windows CMD)
 ├── run-vota.ps1      (Script di avvio PowerShell)
-└── vota.js           (Script primario del bot)
+└── vota.js           (Entry point - coordina i moduli src/)
 ```
 
 ## 🚀 Funzionalità Pianificate
