@@ -14,6 +14,18 @@ e questo progetto aderisce al [Versionamento Semantico](https://semver.org/spec/
 
 ---
 
+## [1.4.0] - 2026-03-25
+
+### Tecnico
+- Riorganizzazione completa del codice: `vota.js` suddiviso in 4 moduli separati nella cartella `src/`.
+  - `src/config.js` — Caricamento `.env` ed esportazione di tutte le costanti.
+  - `src/utils.js` — Funzioni di supporto generiche (`sleep`, `normalizeName`, `extractSlugFromUrl`).
+  - `src/api.js` — Comunicazione con le API di Minecraft-Italia (pre-check, info server, voti).
+  - `src/browser.js` — Automazione Puppeteer: sessione, login, rilevamento giocatore e voto.
+- `vota.js` ridotto a controller snello (~50 righe) che orchestra i moduli.
+
+---
+
 ## [1.3.3] - 2026-03-25
 
 ### Modificato
