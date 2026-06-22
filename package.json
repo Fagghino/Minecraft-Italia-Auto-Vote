@@ -1,6 +1,6 @@
 {
   "name": "bot-auto-vote",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Bot Node.js per votare automaticamente su minecraft-italia.net.",
   "main": "vota.js",
   "scripts": {
