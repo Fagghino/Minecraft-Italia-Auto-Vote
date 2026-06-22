@@ -35,7 +35,7 @@ function extractSlugFromUrl(url) {
     const parts = u.pathname.split('/').filter(Boolean);
     const idx = parts.indexOf('server');
     if (idx >= 0 && parts.length > idx + 1) return parts[idx + 1];
-    return parts.length ? parts[parts.length - 1] : null;
+    return null;
   } catch (e) {
     const m = url.match(/\/server\/([^\/\?]+)/);
     return m ? m[1] : null;
