@@ -2,7 +2,7 @@
 
 Bot/script Node.js per automatizzare l'invio di un voto "+1" su `minecraft-italia.net` usando `Puppeteer`.
 
-[![Versione](https://img.shields.io/badge/versione-1.4.0-blue.svg)]()
+[![Versione](https://img.shields.io/badge/versione-1.4.1-blue.svg)]()
 
 > 📝 **Changelog**: Vedi [CHANGELOG.md](Docs/Changelog.md) per la cronologia delle versioni.
 
