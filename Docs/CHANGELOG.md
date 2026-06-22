@@ -9,6 +9,13 @@ e questo progetto aderisce al [Versionamento Semantico](https://semver.org/spec/
 
 ## [Non Rilasciato]
 
+### Aggiunto
+- Nessuna modifica pianificata.
+
+---
+
+## [1.4.1] - 2026-06-22
+
 ### Fixed
 - `src/browser.js`: gestisce i cookie corrotti, salva i cookie in modo atomico e verifica effettivamente il successo del login prima di salvare la sessione.
 - `src/browser.js`: rende il flusso di voto più robusto con selettori più specifici e attese dinamiche anziché timeout fissi.
