@@ -1,6 +1,6 @@
 // ========================================
 // vota.js - Controller principale
-// Minecraft-Italia Auto-Vote v1.4.0
+// Minecraft-Italia Auto-Vote v1.4.1
 // ========================================
 
 const puppeteer = require('puppeteer');
@@ -10,7 +10,7 @@ const { loadCookies, isLoggedIn, login, vota } = require('./src/browser');
 async function main() {
   console.log('\n╔════════════════════════════════════════════╗');
   console.log('║   🤖 MINECRAFT-ITALIA AUTO-VOTE BOT        ║');
-  console.log('║   Versione 1.4.0                           ║');
+  console.log('║   Versione 1.4.1                           ║');
   console.log('╚════════════════════════════════════════════╝\n');
 
   if (!HEADLESS) console.log('👁️  Modalità visibile attiva (debug)\n');
