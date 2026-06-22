@@ -28,23 +28,50 @@ const { extractSlugFromUrl } = require('./utils');
  * @returns {boolean}
  */
 async function loadCookies(page) {
-  if (fs.existsSync(COOKIES_PATH)) {
-    const cookies = JSON.parse(fs.readFileSync(COOKIES_PATH, 'utf8'));
+  if (!fs.existsSync(COOKIES_PATH)) return false;
+
+  try {
+    const raw = fs.readFileSync(COOKIES_PATH, 'utf8');
+    const cookies = JSON.parse(raw);
+    if (!Array.isArray(cookies) || cookies.length === 0) {
+      console.log('⚠️  File cookies.json vuoto o non valido, ignorato');
+      return false;
+    }
+
+    const now = Date.now() / 1000;
+    const expirations = cookies.filter(c => typeof c.expires === 'number' && c.expires > 0);
+    if (expirations.length > 0 && expirations.every(c => c.expires < now)) {
+      console.log('⚠️  Cookies scaduti (controllo locale), salto la verifica di rete');
+      return false;
+    }
+
     await page.setCookie(...cookies);
     console.log('🍪 Sessione precedente trovata');
     return true;
+  } catch (err) {
+    console.log(`⚠️  Cookies.json illeggibile (${err.message}), procedo con nuovo login`);
+    return false;
   }
-  return false;
 }
 
 /**
- * Salva i cookies della pagina corrente su file.
+ * Salva i cookies della pagina corrente su file in modo atomico.
  * @param {import('puppeteer').Page} page
  */
 async function saveCookies(page) {
   const cookies = await page.cookies();
-  fs.writeFileSync(COOKIES_PATH, JSON.stringify(cookies, null, 2));
+  const tmpPath = COOKIES_PATH + '.tmp';
+  fs.writeFileSync(tmpPath, JSON.stringify(cookies, null, 2));
+  fs.renameSync(tmpPath, COOKIES_PATH);
   console.log('💾 Sessione salvata');
+}
+
+async function checkLoginIndicators(page) {
+  return await page.evaluate(() =>
+    document.querySelector('a[href*="/account/"]') !== null ||
+    document.querySelector('.userLink') !== null ||
+    document.querySelector('a[href*="/logout"]') !== null
+  );
 }
 
 /**
@@ -55,11 +82,7 @@ async function saveCookies(page) {
 async function isLoggedIn(page) {
   try {
     await page.goto('https://minecraft-italia.net', { waitUntil: 'networkidle2' });
-    return await page.evaluate(() =>
-      document.querySelector('a[href*="/account/"]') !== null ||
-      document.querySelector('.userLink') !== null ||
-      document.querySelector('a[href*="/logout"]') !== null
-    );
+    return await checkLoginIndicators(page);
   } catch {
     return false;
   }
@@ -78,7 +101,11 @@ async function login(page) {
 
   // Gestione banner GDPR
   try {
-    await new Promise(r => setTimeout(r, 5000));
+    await page.waitForFunction(() => {
+      return Array.from(document.querySelectorAll('button'))
+        .some(b => b.textContent.trim().includes('Acconsento'));
+    }, { timeout: 5000 });
+
     await page.evaluate(() => {
       const btn = Array.from(document.querySelectorAll('button'))
         .find(b => b.textContent.trim().includes('Acconsento'));
@@ -93,7 +120,12 @@ async function login(page) {
   await page.type('input[name="password"]', PASSWORD);
   await page.focus('input[name="password"]');
   await page.keyboard.press('Enter');
-  await page.waitForNavigation({ waitUntil: 'networkidle2' });
+  await page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 15000 });
+
+  const loginRiuscito = await checkLoginIndicators(page);
+  if (!loginRiuscito) {
+    throw new Error('Login fallito: credenziali errate o pagina di login non superata');
+  }
 
   console.log('✅ Login completato con successo');
   await saveCookies(page);
@@ -165,7 +197,7 @@ async function vota(page) {
 
   console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
   console.log('🎯 AVVIO PROCESSO DI VOTO');
-  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
 
   // Tenta rilevamento automatico del nome giocatore se non impostato
   if (!playerName || playerName === 'InserisciNick') {
@@ -193,9 +225,9 @@ async function vota(page) {
   }
 
   // ━━━━━━━━ INFO ━━━━━━━━
-  console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-  console.log('    INFO');
-  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  //console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  //console.log('    INFO');
+  //console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
   console.log(playerName && playerName !== 'InserisciNick' ? `👤 Giocatore: ${playerName}` : '👤 Giocatore: non rilevato');
   console.log(`🏰 Server: ${serverName}`);
 
@@ -228,7 +260,7 @@ async function vota(page) {
     }
     console.log('   Riprova domani per votare di nuovo');
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
-    return;
+    return { esito: 'gia_votato' };
   } else if (USE_API_PRECHECK && playerName && playerName !== 'InserisciNick') {
     console.log('✅ Nessun voto trovato oggi - procedo con il voto');
   } else {
@@ -241,6 +273,11 @@ async function vota(page) {
   try {
     // Step 1: Click +1
     const plusOneCliccato = await page.evaluate(() => {
+      const candidate = document.querySelector('div.button.vote-button') || document.querySelector('div.button[data-action="vote"]');
+      if (candidate) {
+        candidate.click();
+        return true;
+      }
       const votaDiv = Array.from(document.querySelectorAll('div.button'))
         .find(div => div.textContent.trim().includes('+1'));
       if (votaDiv) { votaDiv.click(); return true; }
@@ -249,11 +286,19 @@ async function vota(page) {
 
     if (!plusOneCliccato) {
       console.log('❌ Errore: pulsante di voto non trovato sulla pagina');
-      return;
+      return { esito: 'errore', dettaglio: 'pulsante_non_trovato' };
     }
 
     console.log('⏳ Invio voto in corso...');
-    await new Promise(r => setTimeout(r, 1500));
+    try {
+      await page.waitForFunction(() => {
+        const text = document.body.innerText.toLowerCase();
+        return text.includes('gia fatto') || text.includes('già fatto') ||
+          text.includes('già votato') || text.includes('gia votato') ||
+          Array.from(document.querySelectorAll('button, div.button, a.button, input[type="submit"], div[role="button"]'))
+            .some(btn => btn.textContent?.trim().toLowerCase().includes('vota'));
+      }, { timeout: 5000 });
+    } catch {}
 
     // Step 2: Gestione popup
     const risultatoPopup = await page.evaluate(() => {
@@ -273,13 +318,18 @@ async function vota(page) {
       console.log('\n⏰ Hai già votato oggi per questo server!');
       console.log('   Riprova domani per votare di nuovo\n');
       console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
-      return;
+      return { esito: 'gia_votato' };
     } else if (risultatoPopup.tipo === 'voto_cliccato') {
-      await new Promise(r => setTimeout(r, 2500));
+      try {
+        await page.waitForFunction(() => {
+          return !Array.from(document.querySelectorAll('button, div.button, a.button, input[type="submit"], div[role="button"]'))
+            .some(el => el.textContent?.trim().toLowerCase().includes('vota'));
+        }, { timeout: 5000 });
+      } catch {}
     } else {
       console.log('⚠️  Risposta del server non riconosciuta');
       console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
-      return;
+      return { esito: 'errore', dettaglio: 'popup_sconosciuto' };
     }
 
     // Step 4: Conferma successo
@@ -289,12 +339,14 @@ async function vota(page) {
     console.log(`   🎉 Grazie per aver supportato ${serverName}`);
     console.log(`   🕐 Data e ora: ${data} alle ${ora}\n`);
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+    return { esito: 'successo' };
 
   } catch (error) {
     console.error('\n❌ ERRORE DURANTE IL VOTO');
     console.error(`   Dettagli: ${error.message || error}`);
     console.error('   Riprova più tardi o controlla la configurazione\n');
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+    return { esito: 'errore', dettaglio: error.message || String(error) };
   }
 }
 
