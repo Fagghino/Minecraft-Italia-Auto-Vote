@@ -9,8 +9,8 @@ const { loadCookies, isLoggedIn, login, vota } = require('./src/browser');
 
 async function main() {
   console.log('\n╔════════════════════════════════════════════╗');
-  console.log('║   🤖 MINECRAFT-ITALIA AUTO-VOTE BOT      ║');
-  console.log('║   Versione 1.4.0                          ║');
+  console.log('║   🤖 MINECRAFT-ITALIA AUTO-VOTE BOT        ║');
+  console.log('║   Versione 1.4.0                           ║');
   console.log('╚════════════════════════════════════════════╝\n');
 
   if (!HEADLESS) console.log('👁️  Modalità visibile attiva (debug)\n');
@@ -35,20 +35,27 @@ async function main() {
       console.log('');
     }
 
-    await vota(page);
+    return await vota(page);
 
   } catch (err) {
     console.error('\n❌ ERRORE CRITICO');
     console.error(`   ${err.message || err}`);
     console.error('   Controlla la tua connessione e configurazione\n');
+    return { esito: 'errore', dettaglio: err.message || String(err) };
   } finally {
     await browser.close();
     console.log('🚀 Script terminato.\n');
   }
 }
 
-main().catch(err => {
-  console.error('\n❌ ERRORE CRITICO NON GESTITO');
-  console.error(`   ${err.message || err}\n`);
-  process.exit(1);
-});
+main()
+  .then(esito => {
+    if (esito?.esito === 'successo') return process.exit(0);
+    if (esito?.esito === 'gia_votato') return process.exit(2);
+    return process.exit(1);
+  })
+  .catch(err => {
+    console.error('\n❌ ERRORE CRITICO NON GESTITO');
+    console.error(`   ${err.message || err}\n`);
+    process.exit(1);
+  });
