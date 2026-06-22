@@ -121,17 +121,15 @@ async function checkPlayerVotedToday(serverSlug, playerName) {
     if (!Array.isArray(votes)) return { alreadyVoted: false, serverTotalVotes };
 
     const target = normalizeName(playerName);
-    const match = votes.find(v => {
+    const isMatch = v => {
       if (!v.username) return false;
       const a = normalizeName(v.username);
       return a === target || a.includes(target) || target.includes(a);
-    });
+    };
 
-    const playerVotesOnServer = votes.filter(v => {
-      if (!v.username) return false;
-      const a = normalizeName(v.username);
-      return a === target || a.includes(target) || target.includes(a);
-    }).length;
+    const matchingVotes = votes.filter(isMatch);
+    const match = matchingVotes[0] || null;
+    const playerVotesOnServer = matchingVotes.length;
 
     let lastVoteTime = null;
     if (match) {
