@@ -9,8 +9,13 @@ e questo progetto aderisce al [Versionamento Semantico](https://semver.org/spec/
 
 ## [Non Rilasciato]
 
-### Pianificato
-- //
+### Fixed
+- `src/browser.js`: gestisce i cookie corrotti, salva i cookie in modo atomico e verifica effettivamente il successo del login prima di salvare la sessione.
+- `src/browser.js`: rende il flusso di voto più robusto con selettori più specifici e attese dinamiche anziché timeout fissi.
+- `src/api.js`: elimina la duplicazione della logica di confronto dei nomi durante il controllo dei voti giornalieri.
+- `src/utils.js`: evita un fallback sbagliato in `extractSlugFromUrl` quando l'URL non contiene `/server/`.
+- `vota.js`: restituisce esiti strutturati e mappa i risultati su exit code distinti (`0` successo, `2` già votato, `1` errore).
+- `.gitignore`: estende le regole di ignoramento per file di Node.js, cache, log, editor e sistemi operativi.
 
 ---
 
